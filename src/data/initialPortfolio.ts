@@ -1,0 +1,211 @@
+import { PortfolioState } from '../types';
+
+export const initialPortfolioData: PortfolioState = {
+  profile: {
+    name: 'Sinchana M',
+    role: 'AI & Machine Learning Developer | CSE Undergraduate',
+    tagline: 'Designing intelligent AI applications, machine learning workflows, and responsive web solutions.',
+    status: 'Available for Internships',
+    email: 'sinchana21005@gmail.com',
+    phone: '+91 9611603950',
+    location: 'Mysore, Karnataka, India',
+    linkedinUrl: 'https://www.linkedin.com/in/sinchana-m-495334310',
+    githubUrl: 'https://github.com/sinchanam-21',
+    summary: 'Computer Science student with strong skills in Python and Machine Learning, with knowledge of Deep Learning and Generative AI. Passionate about solving real-world problems using AI and seeking an internship or entry-level opportunity to gain practical industry experience.',
+    interests: [
+      'Generative AI & LLM Systems',
+      'Deep Learning & Neural Networks',
+      'Volleyball (State-Level Player)',
+      'Drawing & Creative Sketching',
+      'Listening to Music',
+      'Fashion Design & Aesthetics'
+    ],
+    achievements: [
+      'State-level volleyball player during Pre-University studies (PUC), demonstrating dedication, agility, and sportsmanship.',
+      'Active developer building end-to-end GenAI applications with Flask and Google Gemini 2.5 Flash API.',
+      'Consistently ranked with high academic performance across Secondary (88.96%) and Pre-University (86.66%).'
+    ]
+  },
+  education: [
+    {
+      id: 'edu-1',
+      degree: 'Bachelor of Engineering - Computer Science & Engineering',
+      institution: 'Maharaja Institute of Technology Mysore',
+      period: '2023 – 2027',
+      score: 'CGPA: 7.5 / 10',
+      location: 'Mysore, Karnataka',
+      highlights: [
+        'Core coursework: Data Structures & Algorithms, Operating Systems, Database Management Systems, AI Principles.',
+        'Actively participating in technical hackathons and departmental coding workshops.'
+      ]
+    },
+    {
+      id: 'edu-2',
+      degree: 'Pre-University (PCMB - Physics, Chemistry, Mathematics, Biology)',
+      institution: 'M D R PU Science College',
+      period: '2021 – 2023',
+      score: 'Score: 86.66%',
+      location: 'Gundlupete, Karnataka',
+      highlights: [
+        'State-level volleyball player representing the institution in competitive tournaments.',
+        'Distinction in Mathematics and Physics foundations.',
+        'Strong analytical thinking and scientific problem-solving methodology.'
+      ]
+    },
+    {
+      id: 'edu-3',
+      degree: 'Secondary Education (SSLC)',
+      institution: 'K R C R School',
+      period: '2020 – 2021',
+      score: 'Score: 88.96%',
+      location: 'Chamarajanagar, Karnataka',
+      highlights: [
+        'School volleyball player and active sports team member.',
+        'Creative drawing and artistic pencil sketching enthusiast.',
+        'Academic excellence award with 88.96% distinction.'
+      ]
+    }
+  ],
+  skills: [
+    {
+      id: 'skill-programming',
+      name: 'Programming & Web',
+      skills: [
+        { name: 'Python', level: 'Advanced' },
+        { name: 'HTML5 / CSS3', level: 'Intermediate' },
+        { name: 'JavaScript', level: 'Intermediate' },
+        { name: 'C Language', level: 'Intermediate' }
+      ]
+    },
+    {
+      id: 'skill-aiml',
+      name: 'AI & Machine Learning',
+      skills: [
+        { name: 'Generative AI', level: 'Intermediate' },
+        { name: 'Machine Learning', level: 'Intermediate' },
+        { name: 'Deep Learning', level: 'Intermediate' },
+        { name: 'Natural Language Processing', level: 'Intermediate' }
+      ]
+    },
+    {
+      id: 'skill-frameworks',
+      name: 'Frameworks & Libraries',
+      skills: [
+        { name: 'PyTorch', level: 'Intermediate' },
+        { name: 'TensorFlow', level: 'Intermediate' },
+        { name: 'NumPy', level: 'Advanced' },
+        { name: 'Pandas', level: 'Advanced' },
+        { name: 'Flask', level: 'Intermediate' }
+      ]
+    },
+    {
+      id: 'skill-database',
+      name: 'Databases & Core CS',
+      skills: [
+        { name: 'SQL', level: 'Intermediate' },
+        { name: 'MySQL', level: 'Intermediate' },
+        { name: 'Data Structures & Algorithms (DSA)', level: 'Intermediate' },
+        { name: 'Operating Systems', level: 'Intermediate' }
+      ]
+    },
+    {
+      id: 'skill-platforms',
+      name: 'Tools & Platforms',
+      skills: [
+        { name: 'VS Code', level: 'Proficient' },
+        { name: 'Jupyter Notebook', level: 'Proficient' },
+        { name: 'Google Colab', level: 'Proficient' },
+        { name: 'GitHub & Git', level: 'Intermediate' }
+      ]
+    },
+    {
+      id: 'skill-soft',
+      name: 'Soft Skills',
+      skills: [
+        { name: 'Problem Solving' },
+        { name: 'Self-Motivation' },
+        { name: 'Adaptability' },
+        { name: 'Time Management' }
+      ]
+    }
+  ],
+  projects: [
+    {
+      id: 'proj-nexus',
+      title: 'Nexus Security AI',
+      category: 'AI & ML',
+      featured: true,
+      role: 'Lead Developer',
+      description: 'An end-to-end intelligent cybersecurity assistant web application built with Flask and Google Gemini API (gemini-2.5-flash) to evaluate security postures and assist developers with defensive intelligence.',
+      highlights: [
+        'Integrated Google Gemini 2.5 Flash model for rapid contextual security scanning and automated code inspection.',
+        'Engineered responsive conversational AI interface with streamlined Flask server proxying requests safely.',
+        'Provides actionable remediations, CVE matching guidelines, and real-time security suggestions.'
+      ],
+      techStack: ['Python', 'Flask', 'Gemini 2.5 Flash API', 'GenAI', 'Tailwind CSS', 'JavaScript'],
+      githubUrl: 'https://github.com/sinchanam-21',
+      liveUrl: 'https://github.com/sinchanam-21'
+    },
+    {
+      id: 'proj-resume',
+      title: 'AI Resume Analyzer',
+      category: 'AI & ML',
+      featured: true,
+      role: 'ML Developer',
+      description: 'Intelligent resume analysis platform that parses PDF/Word resumes, predicts candidate technical skills, calculates ATS compatibility scoring, and outputs tailored suggestions for improvement.',
+      highlights: [
+        'Extracts keywords and technical competencies using text parsing, tokenization, and pattern matching algorithms.',
+        'Calculates real-time ATS match percentage based on target job description criteria.',
+        'Generates personalized recommendations to improve formatting, impact statements, and missing technical competencies.'
+      ],
+      techStack: ['Python', 'Machine Learning', 'NLP', 'Pandas', 'PyTorch / Scikit-Learn', 'Regex'],
+      githubUrl: 'https://github.com/sinchanam-21',
+      liveUrl: 'https://github.com/sinchanam-21'
+    },
+    {
+      id: 'proj-library',
+      title: 'Library Book Management System',
+      category: 'Systems & DB',
+      featured: true,
+      role: 'Backend & Database Designer',
+      description: 'Robust desktop & database management system designed to track comprehensive book inventories, manage student borrowing cycles, verify instant availability, and calculate automated late return penalty charges.',
+      highlights: [
+        'Designed normalized relational schema with MySQL for books, members, issues, returns, and penalty calculations.',
+        'Automated overdue fee computation logic based on configurable daily late charge thresholds.',
+        'Implemented search filters by title, author, ISBN, and availability status.'
+      ],
+      techStack: ['Python', 'MySQL', 'SQL Queries', 'Relational DB Design', 'CRUD Operations'],
+      githubUrl: 'https://github.com/sinchanam-21',
+      liveUrl: 'https://github.com/sinchanam-21'
+    }
+  ],
+  certifications: [
+    {
+      id: 'cert-1',
+      title: 'Cyber Security Technologies (IBM)',
+      issuer: 'Coursera (IBM)',
+      issueDate: 'October 2025',
+      credentialUrl: 'https://www.coursera.org',
+      badgeCode: 'IBM-CST-2025'
+    },
+    {
+      id: 'cert-2',
+      title: 'ARGHYA : Empowering Engineer With Next-Gen AI Tool',
+      issuer: 'ARGHYA Innovation Center',
+      issueDate: 'November 2025',
+      credentialUrl: 'https://github.com/sinchanam-21',
+      badgeCode: 'ARGHYA-AI-ENG'
+    },
+    {
+      id: 'cert-3',
+      title: 'AI Tools Workshop',
+      issuer: 'be10x',
+      issueDate: 'June 2025',
+      credentialUrl: 'https://github.com/sinchanam-21',
+      badgeCode: 'BE10X-AI-WORKSHOP'
+    }
+  ],
+  contactMessages: [],
+  // Initial owner passcode (can be changed to any private PIN in owner settings)
+  ownerPasscodeHash: '21005'
+};

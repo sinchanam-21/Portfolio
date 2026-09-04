@@ -1,0 +1,6 @@
+{
+  "name": "Sinchana M - Personal Portfolio",
+  "description": "Professional personal portfolio website showcasing AI & ML projects, resume, skills, and certifications with private owner edit mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
