@@ -6,32 +6,6 @@ Built with **React 19**, **TypeScript**, **Vite**, and **Tailwind CSS**.
 
 ---
 
-## 🌟 Key Features
-
-- **Hero & Identity Card**:
-  - Highlights academic background, CSE scholar status, contact points, and direct links to GitHub and LinkedIn.
-  - Interactive status badges and dynamic counters for projects and certifications.
-- **Formal Academic Registry**:
-  - **Bachelor of Engineering (CSE)** at Maharaja Institute of Technology Mysore (2023–2027) — CGPA: 7.5 / 10.
-  - **Pre-University (PCMB)** at M D R PU Science College (2021–2023) — Score: 86.66%, State-level volleyball player.
-  - **Secondary Education (SSLC)** at K R C R School (2020–2021) — Score: 88.96%, School volleyball player & drawing enthusiast.
-- **Interactive Resume Modal**:
-  - Instant in-browser resume viewer with options to print or export as PDF.
-- **Technical Skills Matrix**:
-  - Programming Languages (Python, Java, C++, SQL, JavaScript).
-  - Machine Learning & Generative AI (PyTorch, TensorFlow, Scikit-Learn, Gemini 2.5 Flash API, Prompt Engineering).
-  - Web & Systems (Flask, React, HTML5/CSS3, MySQL, Git, Linux).
-- **Featured Projects**:
-  - Detailed case studies with architecture summaries, tech stack badges, and GitHub links.
-- **Certifications & Accreditations**:
-  - Verified credentials with credential verification links.
-- **Contact & Inquiries**:
-  - Direct message form with local storage persistence and owner inbox.
-- **Private Owner Mode**:
-  - Passcode-authenticated editor to update profile details, project entries, and view incoming messages directly from the interface.
-
----
-
 ## 🛠️ Tech Stack
 
 - **Frontend Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
@@ -128,8 +102,3 @@ npm run preview
 
 The portfolio contains a private management modal accessible by clicking the subtle lock / owner link in the footer or navigation. Access is strictly authenticated with a private owner PIN to protect against unauthorized edits. In owner mode, the owner can update profile information, manage projects, and review inquiries.
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
