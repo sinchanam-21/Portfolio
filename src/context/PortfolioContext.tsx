@@ -61,16 +61,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (saved) {
         const parsed = JSON.parse(saved);
         
-        // Ensure education contains the updated volleyball & drawing points
         let education = initialPortfolioData.education;
         if (parsed.education?.length) {
-          // If user customized education in owner mode, check if outdated
-          const hasOutdatedSports = parsed.education.some((edu: EducationItem) =>
-            edu.highlights?.some((h: string) => h.toLowerCase().includes('athlete') || h.toLowerCase().includes('state-level sports representations'))
-          );
-          if (!hasOutdatedSports) {
-            education = parsed.education;
-          }
+          education = parsed.education;
         }
 
         return {
@@ -79,9 +72,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           profile: { 
             ...initialPortfolioData.profile, 
             ...parsed.profile,
-            status: 'Available for Internships',
-            interests: initialPortfolioData.profile.interests,
-            achievements: initialPortfolioData.profile.achievements
+            status: parsed.profile?.status || initialPortfolioData.profile.status,
+            interests: parsed.profile?.interests?.length ? parsed.profile.interests : initialPortfolioData.profile.interests,
+            achievements: parsed.profile?.achievements?.length ? parsed.profile.achievements : initialPortfolioData.profile.achievements
           },
           education,
           skills: parsed.skills?.length ? parsed.skills : initialPortfolioData.skills,
@@ -102,7 +95,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   });
 
   const [isOwner, setIsOwner] = useState<boolean>(() => {
-    return sessionStorage.getItem(OWNER_AUTH_KEY) === 'true';
+    return typeof window !== 'undefined' && sessionStorage.getItem(OWNER_AUTH_KEY) === 'true';
   });
 
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
@@ -111,6 +104,96 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [editModalTab, setEditModalTab] = useState<'profile' | 'projects' | 'skills' | 'education' | 'certifications' | 'security'>('profile');
   const [isMessagesDrawerOpen, setIsMessagesDrawerOpen] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  // Sync with central server on mount so everyone sees the latest saved portfolio
+  useEffect(() => {
+    let isMounted = true;
+    async function loadServerPortfolio() {
+      try {
+        const res = await fetch('/api/portfolio');
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.success && json.data && isMounted) {
+            const serverData: PortfolioState = json.data;
+            const savedPin = localStorage.getItem(SECURE_PIN_STORAGE_KEY);
+            setData((prev) => ({
+              ...prev,
+              ...serverData,
+              profile: {
+                ...prev.profile,
+                ...serverData.profile,
+              },
+              education: serverData.education?.length ? serverData.education : prev.education,
+              skills: serverData.skills?.length ? serverData.skills : prev.skills,
+              projects: serverData.projects?.length ? serverData.projects : prev.projects,
+              certifications: serverData.certifications?.length ? serverData.certifications : prev.certifications,
+              ownerPasscodeHash: savedPin || prev.ownerPasscodeHash,
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch server portfolio, utilizing cached state', err);
+      }
+    }
+    loadServerPortfolio();
+
+    // Check for query parameters (?edit=true or ?admin=true)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('edit') === 'true' || urlParams.get('admin') === 'true') {
+        const savedPin = localStorage.getItem(SECURE_PIN_STORAGE_KEY);
+        if (savedPin) {
+          setIsOwner(true);
+          sessionStorage.setItem(OWNER_AUTH_KEY, 'true');
+        } else {
+          setIsAuthModalOpen(true);
+        }
+      }
+
+      // Keyboard shortcut Ctrl+Shift+E or Alt+E to open owner auth
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'e') || (e.altKey && e.key.toLowerCase() === 'e')) {
+          e.preventDefault();
+          setIsAuthModalOpen(true);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        isMounted = false;
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Helper to persist changes both to localStorage and the server
+  const persistChanges = async (nextState: PortfolioState, customPin?: string) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
+    } catch (e) {
+      console.error('Failed to save to localStorage', e);
+    }
+
+    // Push to central server so ALL visitors see the changes
+    try {
+      const activePin = (customPin || localStorage.getItem(SECURE_PIN_STORAGE_KEY) || nextState.ownerPasscodeHash || '21005').trim();
+      const res = await fetch('/api/portfolio', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-owner-pin': activePin,
+        },
+        body: JSON.stringify(nextState),
+      });
+      if (!res.ok) {
+        console.warn('Server sync returned non-200 status', res.status);
+      }
+    } catch (err) {
+      console.warn('Server sync error (saved locally)', err);
+    }
+  };
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -131,12 +214,15 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const unlockOwner = (passcode: string): boolean => {
     const trimmed = passcode.trim();
     const storedPin = typeof window !== 'undefined' ? localStorage.getItem(SECURE_PIN_STORAGE_KEY) : null;
-    const activePasscode = storedPin || data.ownerPasscodeHash;
+    const activePasscode = (storedPin || data.ownerPasscodeHash || '21005').trim();
 
     if (trimmed && trimmed === activePasscode) {
       setIsOwner(true);
       sessionStorage.setItem(OWNER_AUTH_KEY, 'true');
-      showNotification('Owner access verified! You can now edit any section.', 'success');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(SECURE_PIN_STORAGE_KEY, trimmed);
+      }
+      showNotification('Owner access verified! Changes you make will be visible to everyone.', 'success');
       return true;
     }
     showNotification('Incorrect PIN. Access restricted to Sinchana M.', 'error');
@@ -148,7 +234,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     sessionStorage.removeItem(OWNER_AUTH_KEY);
     setIsEditModalOpen(false);
     setIsMessagesDrawerOpen(false);
-    showNotification('Owner mode locked. Public preview enabled.', 'info');
+    showNotification('Owner mode locked. Public view enabled.', 'info');
   };
 
   const updatePasscode = (newPasscode: string) => {
@@ -160,53 +246,63 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (typeof window !== 'undefined') {
       localStorage.setItem(SECURE_PIN_STORAGE_KEY, trimmed);
     }
-    setData((prev) => ({
-      ...prev,
+    const updatedState = {
+      ...data,
       ownerPasscodeHash: trimmed,
-    }));
-    showNotification('Owner PIN successfully updated and secured!', 'success');
+    };
+    setData(updatedState);
+    persistChanges(updatedState, trimmed);
+    showNotification('Owner PIN successfully updated and saved!', 'success');
   };
 
   const updateProfile = (profileUpdate: Partial<ProfileData>) => {
-    setData((prev) => ({
-      ...prev,
+    const updatedState = {
+      ...data,
       profile: {
-        ...prev.profile,
+        ...data.profile,
         ...profileUpdate,
       },
-    }));
-    showNotification('Profile information saved.', 'success');
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification('Profile information saved and published to everyone.', 'success');
   };
 
   const addProject = (project: Omit<ProjectItem, 'id'>) => {
     const newId = 'proj-' + Date.now();
-    setData((prev) => ({
-      ...prev,
-      projects: [{ ...project, id: newId }, ...prev.projects],
-    }));
-    showNotification(`Added project "${project.title}".`, 'success');
+    const updatedState = {
+      ...data,
+      projects: [{ ...project, id: newId }, ...data.projects],
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification(`Added project "${project.title}" and published live.`, 'success');
   };
 
   const updateProject = (id: string, updated: Partial<ProjectItem>) => {
-    setData((prev) => ({
-      ...prev,
-      projects: prev.projects.map((p) => (p.id === id ? { ...p, ...updated } : p)),
-    }));
-    showNotification('Project updated.', 'success');
+    const updatedState = {
+      ...data,
+      projects: data.projects.map((p) => (p.id === id ? { ...p, ...updated } : p)),
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification('Project updated and published live.', 'success');
   };
 
   const deleteProject = (id: string) => {
-    setData((prev) => ({
-      ...prev,
-      projects: prev.projects.filter((p) => p.id !== id),
-    }));
-    showNotification('Project removed.', 'info');
+    const updatedState = {
+      ...data,
+      projects: data.projects.filter((p) => p.id !== id),
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification('Project removed and updated.', 'info');
   };
 
   const addSkill = (categoryId: string, skill: { name: string; level?: string }) => {
-    setData((prev) => ({
-      ...prev,
-      skills: prev.skills.map((cat) => {
+    const updatedState = {
+      ...data,
+      skills: data.skills.map((cat) => {
         if (cat.id === categoryId) {
           return {
             ...cat,
@@ -215,14 +311,16 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         return cat;
       }),
-    }));
-    showNotification(`Skill "${skill.name}" added.`, 'success');
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification(`Skill "${skill.name}" added and saved.`, 'success');
   };
 
   const deleteSkill = (categoryId: string, skillName: string) => {
-    setData((prev) => ({
-      ...prev,
-      skills: prev.skills.map((cat) => {
+    const updatedState = {
+      ...data,
+      skills: data.skills.map((cat) => {
         if (cat.id === categoryId) {
           return {
             ...cat,
@@ -231,53 +329,65 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         return cat;
       }),
-    }));
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
     showNotification(`Removed "${skillName}".`, 'info');
   };
 
   const updateEducation = (id: string, updated: Partial<EducationItem>) => {
-    setData((prev) => ({
-      ...prev,
-      education: prev.education.map((e) => (e.id === id ? { ...e, ...updated } : e)),
-    }));
-    showNotification('Education entry updated.', 'success');
+    const updatedState = {
+      ...data,
+      education: data.education.map((e) => (e.id === id ? { ...e, ...updated } : e)),
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification('Education entry updated and published.', 'success');
   };
 
   const addEducation = (edu: Omit<EducationItem, 'id'>) => {
     const newId = 'edu-' + Date.now();
-    setData((prev) => ({
-      ...prev,
-      education: [...prev.education, { ...edu, id: newId }],
-    }));
-    showNotification('Education record added.', 'success');
+    const updatedState = {
+      ...data,
+      education: [...data.education, { ...edu, id: newId }],
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification('Education record added and published.', 'success');
   };
 
   const deleteEducation = (id: string) => {
-    setData((prev) => ({
-      ...prev,
-      education: prev.education.filter((e) => e.id !== id),
-    }));
+    const updatedState = {
+      ...data,
+      education: data.education.filter((e) => e.id !== id),
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
     showNotification('Education record deleted.', 'info');
   };
 
   const addCertification = (cert: Omit<CertificationItem, 'id'>) => {
     const newId = 'cert-' + Date.now();
-    setData((prev) => ({
-      ...prev,
-      certifications: [...prev.certifications, { ...cert, id: newId }],
-    }));
-    showNotification(`Certification "${cert.title}" added.`, 'success');
+    const updatedState = {
+      ...data,
+      certifications: [...data.certifications, { ...cert, id: newId }],
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+    showNotification(`Certification "${cert.title}" added and published.`, 'success');
   };
 
   const deleteCertification = (id: string) => {
-    setData((prev) => ({
-      ...prev,
-      certifications: prev.certifications.filter((c) => c.id !== id),
-    }));
+    const updatedState = {
+      ...data,
+      certifications: data.certifications.filter((c) => c.id !== id),
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
     showNotification('Certification deleted.', 'info');
   };
 
-  const submitContactMessage = (msg: { name: string; email: string; subject: string; message: string }) => {
+  const submitContactMessage = async (msg: { name: string; email: string; subject: string; message: string }) => {
     const newMsg: ContactMessage = {
       id: 'msg-' + Date.now(),
       ...msg,
@@ -291,10 +401,23 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       isRead: false
     };
 
-    setData((prev) => ({
-      ...prev,
-      contactMessages: [newMsg, ...(prev.contactMessages || [])],
-    }));
+    const updatedState = {
+      ...data,
+      contactMessages: [newMsg, ...(data.contactMessages || [])],
+    };
+    setData(updatedState);
+    persistChanges(updatedState);
+
+    // Also post to inquiry endpoint for redundancy
+    try {
+      await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(msg),
+      });
+    } catch {
+      // already saved locally/via state
+    }
     showNotification('Thank you! Your message has been sent successfully.', 'success');
   };
 

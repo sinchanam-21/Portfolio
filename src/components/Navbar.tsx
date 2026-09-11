@@ -162,7 +162,7 @@ export const Navbar: React.FC = () => {
               Resume
             </button>
 
-            {/* Owner Edit Mode Toggle */}
+            {/* Owner Edit Mode Toggle (When active) or Contact link */}
             {isOwner ? (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 px-3 py-1 bg-[#1A1A1A] border border-[#333] rounded-full">
@@ -183,15 +183,12 @@ export const Navbar: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <button
-                id="nav-owner-login-btn"
-                onClick={() => setIsAuthModalOpen(true)}
-                className="text-xs border border-[#333] hover:border-[#C5A059] text-[#999] hover:text-[#C5A059] px-3 py-1.5 rounded transition-colors flex items-center gap-1.5 cursor-pointer"
-                title="Owner Login (Only for Sinchana)"
+              <a
+                href="#contact"
+                className="text-xs border border-[#C5A059] text-[#C5A059] hover:bg-[#C5A059] hover:text-black px-3.5 py-1.5 rounded transition-colors flex items-center gap-1.5 cursor-pointer font-medium uppercase tracking-wider"
               >
-                <Lock className="w-3.5 h-3.5 text-[#666]" />
-                <span className="text-[11px] uppercase tracking-wider">Owner</span>
-              </button>
+                Contact
+              </a>
             )}
           </div>
 
@@ -263,16 +260,13 @@ export const Navbar: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setIsAuthModalOpen(true);
-                  }}
-                  className="w-full py-2 rounded text-xs uppercase tracking-widest text-[#999] hover:text-[#C5A059] bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center gap-1.5"
+                <a
+                  href="#contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 rounded text-xs uppercase tracking-widest text-[#C5A059] hover:bg-[#C5A059] hover:text-black border border-[#C5A059] flex items-center justify-center gap-1.5 transition"
                 >
-                  <Lock className="w-3.5 h-3.5" />
-                  Owner Access
-                </button>
+                  Get in Touch
+                </a>
               )}
             </div>
           </div>

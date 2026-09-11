@@ -21,7 +21,9 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  Check
+  Check,
+  Share2,
+  Globe
 } from 'lucide-react';
 import { ProjectItem } from '../types';
 
@@ -211,6 +213,15 @@ export const OwnerEditModal: React.FC = () => {
     }
   };
 
+  const handleCopyShareLink = () => {
+    if (typeof window === 'undefined') return;
+    const currentOrigin = window.location.origin;
+    // Transform dev container URL to public shared URL if currently in dev container
+    const publicUrl = currentOrigin.replace('ais-dev-', 'ais-pre-');
+    navigator.clipboard.writeText(publicUrl);
+    showNotification('Public link copied! This link does NOT require login and can be opened by anyone.', 'success');
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
       <div className="bg-[#0F0F0F] border border-[#333] w-full max-w-4xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
@@ -223,11 +234,37 @@ export const OwnerEditModal: React.FC = () => {
               Owner Control Panel • <span className="text-[#C5A059] font-mono text-xs uppercase tracking-wider">Sinchana M</span>
             </h3>
           </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCopyShareLink}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs border border-[#333] hover:border-[#C5A059] text-[#CCC] hover:text-[#C5A059] rounded bg-[#161616] transition cursor-pointer"
+              title="Copy the public link to send to others (no login required)"
+            >
+              <Share2 className="w-3.5 h-3.5 text-[#C5A059]" />
+              <span>Copy Public Link</span>
+            </button>
+            <button
+              onClick={() => setIsEditModalOpen(false)}
+              className="p-1.5 rounded text-[#888] hover:text-white hover:bg-[#1A1A1A] transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Live Server Sync Notice */}
+        <div className="bg-[#121212] px-6 py-2 border-b border-[#222] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-[#999]">
+          <div className="flex items-center gap-2">
+            <Globe className="w-3.5 h-3.5 text-[#C5A059] shrink-0" />
+            <span>
+              <strong className="text-[#E0E0E0]">Global Live Sync Active:</strong> Edits you save here are automatically published to the server and visible to everyone who opens the link.
+            </span>
+          </div>
           <button
-            onClick={() => setIsEditModalOpen(false)}
-            className="p-1.5 rounded text-[#888] hover:text-white hover:bg-[#1A1A1A] transition cursor-pointer"
+            onClick={handleCopyShareLink}
+            className="sm:hidden text-xs text-[#C5A059] underline cursor-pointer flex items-center gap-1"
           >
-            <X className="w-5 h-5" />
+            <Share2 className="w-3 h-3" /> Copy Public Link
           </button>
         </div>
 

@@ -102,24 +102,14 @@ export const Footer: React.FC = () => {
               </a>
             </div>
 
-            {/* Owner Privilege Box */}
-            <div className="bg-[#111111] border border-[#262626] rounded p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {isOwner ? (
-                    <>
-                      <Unlock className="w-3.5 h-3.5 text-[#C5A059]" />
-                      <span className="text-[#C5A059] font-medium text-[11px] uppercase tracking-wider">Owner: Unlocked</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-3.5 h-3.5 text-[#666]" />
-                      <span className="text-[#666] font-medium text-[11px] uppercase tracking-wider">Owner: Protected</span>
-                    </>
-                  )}
-                </div>
-
-                {isOwner ? (
+            {/* Professional Status Pill or Owner Controls */}
+            {isOwner ? (
+              <div className="bg-[#111111] border border-[#262626] rounded p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Unlock className="w-3.5 h-3.5 text-[#C5A059]" />
+                    <span className="text-[#C5A059] font-medium text-[11px] uppercase tracking-wider">Owner Active</span>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setIsEditModalOpen(true)}
@@ -134,16 +124,19 @@ export const Footer: React.FC = () => {
                       Lock
                     </button>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="px-2.5 py-1 rounded border border-[#C5A059] text-[#C5A059] hover:bg-[#C5A059] hover:text-black text-[10px] font-medium uppercase tracking-wider transition cursor-pointer"
-                  >
-                    Authenticate
-                  </button>
-                )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-[#111111] border border-[#222] rounded px-3 py-2.5 flex items-center justify-between">
+                <span className="text-[11px] text-[#888] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Open to Opportunities
+                </span>
+                <span className="text-[10px] font-mono text-[#C5A059] uppercase tracking-wider">
+                  Mysore, KA
+                </span>
+              </div>
+            )}
 
           </div>
 
@@ -151,9 +144,26 @@ export const Footer: React.FC = () => {
 
         {/* Bottom copyright & Back to top */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[#666] text-center sm:text-left text-xs">
-            © {new Date().getFullYear()} Sinchana M. Professional Engineering Portfolio.
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-[#666] text-center sm:text-left text-xs">
+              © {new Date().getFullYear()} Sinchana M. All rights reserved.
+            </p>
+            {/* Discreet Admin Access trigger for owner */}
+            <button
+              onClick={() => {
+                if (isOwner) {
+                  setIsEditModalOpen(true);
+                } else {
+                  setIsAuthModalOpen(true);
+                }
+              }}
+              className="text-[#333] hover:text-[#C5A059] transition p-0.5 rounded cursor-pointer"
+              title="Admin Console"
+              aria-label="Admin Console"
+            >
+              <Lock className="w-2.5 h-2.5" />
+            </button>
+          </div>
 
           <button
             onClick={scrollToTop}

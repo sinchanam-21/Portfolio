@@ -98,6 +98,29 @@ npm run preview
 
 ---
 
+## ⚡ Deploying to Vercel
+
+This project is pre-configured with `vercel.json` and serverless API handlers for 1-click deployment on **[Vercel](https://vercel.com/)**.
+
+### Method 1: Deploy via GitHub (Recommended)
+1. Export or push your repository to your GitHub account (e.g. `sinchanam-21/sinchana-portfolio`).
+2. Log into [vercel.com](https://vercel.com) and click **"Add New Project"**.
+3. Select your GitHub repository.
+4. Vercel will automatically detect **Vite**:
+   - **Framework Preset**: `Vite`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+5. Click **"Deploy"**. Your portfolio will be live with a free `*.vercel.app` URL in under a minute!
+
+### Method 2: Deploy via Vercel CLI
+From the root directory:
+```bash
+npx vercel
+```
+Follow the prompts and accept the default settings.
+
+---
+
 ## 🔒 Owner Access
 
 The portfolio contains a private management modal accessible by clicking the subtle lock / owner link in the footer or navigation. Access is strictly authenticated with a private owner PIN to protect against unauthorized edits. In owner mode, the owner can update profile information, manage projects, and review inquiries.
